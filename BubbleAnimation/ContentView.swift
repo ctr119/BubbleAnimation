@@ -17,8 +17,9 @@ struct ContentView: View {
                 height: 300
             )
             
-            let biggerText = Text("Hello World")
-                .font(.largeTitle)
+            let biggerText = Text("Hello 👋🏻\n World!")
+                .fontDesign(.monospaced)
+                .font(.title)
             var resolvedBiggerText = context.resolve(biggerText)
             resolvedBiggerText.shading = .color(.white)
             
@@ -27,8 +28,8 @@ struct ContentView: View {
             bubbleFilterContext.addFilter(.alphaThreshold(min: 0.8, color: .pink))
             bubbleFilterContext.addFilter(.blur(radius: 22))
             // plus, drawing the two circles within the same layer
-            bubbleFilterContext.drawLayer { localContext in
-                localContext.fill(
+            bubbleFilterContext.drawLayer { layerContext in
+                layerContext.fill(
                     Circle().path(
                         in: .init(
                             x: position.x - (120 / 2),
@@ -40,7 +41,7 @@ struct ContentView: View {
                     with: .foreground
                 )
                 
-                localContext.fill(
+                layerContext.fill(
                     Circle().path(in: biggerRect),
                     with: .foreground
                 )
