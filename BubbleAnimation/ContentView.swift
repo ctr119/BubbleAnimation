@@ -6,13 +6,30 @@ struct ContentView: View {
     var body: some View {
         GeometryReader { geometry in
             Canvas { context, size in
-                // These filters are the key for the bubble effect
-                context.addFilter(.alphaThreshold(min: 0.8, color: .pink))
-                context.addFilter(.blur(radius: 22))
+                let screenCenterPoint = CGPoint(
+                    x: geometry.size.width / 2,
+                    y: geometry.size.height / 2
+                )
                 
-                context.drawLayer { graphicContext in
-                    
-                    graphicContext.fill(
+                let biggerRect = CGRect(
+                    x: screenCenterPoint.x - (300 / 2),
+                    y: screenCenterPoint.y - (300 / 2),
+                    width: 300,
+                    height: 300
+                )
+                
+                let biggerText = Text("Hello World")
+                    .font(.largeTitle)
+                var resolvedBiggerText = context.resolve(biggerText)
+                resolvedBiggerText.shading = .color(.white)
+                
+                var bubbleFilterContext = context
+                // These filters are the key for the bubble effect
+                bubbleFilterContext.addFilter(.alphaThreshold(min: 0.8, color: .pink))
+                bubbleFilterContext.addFilter(.blur(radius: 22))
+                // plus, drawing the two circles within the same layer
+                bubbleFilterContext.drawLayer { localContext in
+                    localContext.fill(
                         Circle().path(
                             in: .init(
                                 x: position.x - (120 / 2),
@@ -24,19 +41,17 @@ struct ContentView: View {
                         with: .foreground
                     )
                     
-                    graphicContext.fill(
-                        Circle().path(
-                            in: .init(
-                                x: (geometry.size.width / 2) - (300 / 2),
-                                y: (geometry.size.height / 2) - (300 / 2),
-                                width: 300,
-                                height: 300
-                            )
-                        ),
+                    localContext.fill(
+                        Circle().path(in: biggerRect),
                         with: .foreground
                     )
-                    
                 }
+                
+                context.draw(
+                    resolvedBiggerText,
+                    at: screenCenterPoint,
+                    anchor: .center
+                )
             }
             .background(Color.black.opacity(0.8).ignoresSafeArea())
             .gesture(
